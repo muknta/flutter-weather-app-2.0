@@ -88,7 +88,6 @@ class MainBloc with BlocStreamMixin {
           currentLanguage = event.chosenLanguageCode;
           _setLanguage(Locale(event.chosenLanguageCode));
           await SetLanguage(localRepository: _localRepository).execute(params: event.chosenLanguageCode);
-          print('2222 remembered lang - ${event.chosenLanguageCode}');
         }
       }
     }
@@ -96,7 +95,6 @@ class MainBloc with BlocStreamMixin {
 
   Future<void> _checkLanguage() async {
     String? userLanguage = await GetLanguage(localRepository: _localRepository).execute();
-    print('remembered lang - $userLanguage');
     if (userLanguage == null || userLanguage.isEmpty) {
       userLanguage = currentLanguage;
       await SetLanguage(localRepository: _localRepository).execute(params: userLanguage);

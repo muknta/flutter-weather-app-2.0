@@ -8,14 +8,12 @@ import 'package:sqflite/sqflite.dart';
 class SettingsSqfliteDao {
   Future<Database> get _db async => await SqfliteDatabase.instance.database;
 
-  Future<bool> insert({required Map<String, dynamic> settings}) async {
-    print('INSERT settings $settings');
-    return await (await _db).insert(
-          SettingsSqfliteSchema.tableName,
-          settings,
-        ) !=
-        unsuccessfulReturnValueSqflite;
-  }
+  Future<bool> insert({required Map<String, dynamic> settings}) async =>
+      await (await _db).insert(
+        SettingsSqfliteSchema.tableName,
+        settings,
+      ) !=
+      unsuccessfulReturnValueSqflite;
 
   Future<bool> deleteAll() async =>
       await (await _db).delete(SettingsSqfliteSchema.tableName) != unsuccessfulReturnValueSqflite;

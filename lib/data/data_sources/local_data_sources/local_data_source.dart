@@ -53,7 +53,6 @@ class LocalDataSource implements ILocalDataSource {
   Future<String?> getLanguage() async {
     final Map<String, dynamic>? langMap =
         await _settingsSqfliteDao.getColumnFieldByName(fieldName: SettingsSqfliteSchema.language);
-    print('${langMap?[SettingsSqfliteSchema.language]} ------GET------ $langMap');
     return langMap?[SettingsSqfliteSchema.language];
   }
 
@@ -99,7 +98,6 @@ class LocalDataSource implements ILocalDataSource {
   Future<bool> setLanguage({required String language}) async {
     final Map<String, dynamic>? immutableQueryRow = await _settingsSqfliteDao.getQueryRow();
     Map<String, dynamic>? mutableQueryRow;
-    print('${immutableQueryRow?[SettingsSqfliteSchema.language]} ------SET------ $immutableQueryRow');
     if (immutableQueryRow == null || immutableQueryRow.isEmpty) {
       mutableQueryRow = <String, dynamic>{SettingsSqfliteSchema.language: language};
     } else {

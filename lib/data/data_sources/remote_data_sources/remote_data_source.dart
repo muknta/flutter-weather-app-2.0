@@ -8,7 +8,6 @@ import 'package:weather_app_2_0/data/mapper/hour/hourly_mapper.dart';
 import 'package:weather_app_2_0/data/api/rest_api/services/openweathermap_service.dart';
 import 'package:weather_app_2_0/domain/model/day/day.dart';
 import 'package:weather_app_2_0/domain/model/hour/hour.dart';
-import 'package:flutter/foundation.dart';
 
 @LazySingleton(as: IRemoteDataSource)
 class RemoteDataSource implements IRemoteDataSource {
@@ -27,11 +26,8 @@ class RemoteDataSource implements IRemoteDataSource {
     required double longitude,
     required String language,
   }) async {
-    debugPrint('ApiUtil IN getDay: latitude: $latitude, longitude: $longitude, language: $language');
     final body = GetRequestBody(latitude: latitude, longitude: longitude, language: language);
-    debugPrint('ApiUtil IN getDay: body: $body; body.toDailyApi(): ${body.toDailyApi()}');
     final dayList = await _weatherService.fetchDailyContent(body);
-    debugPrint('ApiUtil OUT getDay: dayList: $dayList, dayList[0].pressure ${dayList[0].pressure}');
     return DailyMapper.fromApi(dayList);
   }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:weather_app_2_0/domain/model/day/day.dart';
 import 'package:weather_app_2_0/domain/model/hour/hour.dart';
 import 'package:weather_app_2_0/presentation/pages/day_details_page.dart';
@@ -41,6 +42,11 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         ),
       );
     case dayDetailsRoute:
+      SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+        systemNavigationBarColor: Colors.white,
+        systemNavigationBarDividerColor: Colors.white,
+        systemNavigationBarIconBrightness: Brightness.dark,
+      ));
       final arguments = settings.arguments as Map<String, dynamic>;
       final Day day = arguments[dayDetailsRouteDayArg];
       return _getPageRoute(
