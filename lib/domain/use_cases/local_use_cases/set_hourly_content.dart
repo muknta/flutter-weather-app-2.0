@@ -10,5 +10,9 @@ class SetHourlyContent with IUseCase<bool, List<Hour>> {
   final ILocalRepository _localRepository;
 
   @override
-  Future<bool> execute({required List<Hour> params}) => _localRepository.setHourlyContent(content: params);
+  Future<bool> execute({required List<Hour> params}) async {
+    final bool deletingResult = await _localRepository.deleteHourlyContent();
+    final bool settingResult = await _localRepository.setHourlyContent(content: params);
+    return deletingResult && settingResult;
+  }
 }

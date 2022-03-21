@@ -59,4 +59,10 @@ class LocalDataSource implements ILocalDataSource {
     }
     return (await _hourSqfliteDao.insertAll(hours: mapList)).every((isCorrectExit) => isCorrectExit);
   }
+
+  @override
+  Future<bool> deleteDailyContent() => _daySqfliteDao.deleteAll();
+
+  @override
+  Future<bool> deleteHourlyContent() => _hourSqfliteDao.deleteAll();
 }

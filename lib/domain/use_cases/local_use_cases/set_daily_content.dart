@@ -10,5 +10,9 @@ class SetDailyContent with IUseCase<bool, List<Day>> {
   final ILocalRepository _localRepository;
 
   @override
-  Future<bool> execute({required List<Day> params}) => _localRepository.setDailyContent(content: params);
+  Future<bool> execute({required List<Day> params}) async {
+    final bool deletingResult = await _localRepository.deleteDailyContent();
+    final bool settingResult = await _localRepository.setDailyContent(content: params);
+    return deletingResult && settingResult;
+  }
 }

@@ -27,20 +27,17 @@ class HomeScreen extends StatefulWidget {
 
 class HomeScreenState extends State<HomeScreen> {
   String? _language;
-  Widget? _apiContentWidget;
   late MainBloc mainBloc;
 
   @override
   void initState() {
     super.initState();
-    _language = 'en';
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     mainBloc = Provider.of<MainBloc>(context);
-    // _locationWidget = _getLocationWidget();
   }
 
   @override
@@ -71,14 +68,14 @@ class HomeScreenState extends State<HomeScreen> {
       );
 
   Widget _languageChooser() => DropdownButton<String>(
-        value: _language,
+        value: context.locale.languageCode,
         icon: const Icon(Icons.arrow_downward),
         iconSize: 24,
         elevation: 16,
-        style: const TextStyle(color: Colors.brown),
+        style: const TextStyle(color: Colors.black),
         underline: Container(
           height: 2,
-          color: Colors.brown,
+          color: Colors.black,
         ),
         onChanged: (String? chosenLang) {
           mainBloc.addEvent(ChangeLanguageEvent(chosenLanguageCode: chosenLang!));
@@ -101,13 +98,12 @@ class HomeScreenState extends State<HomeScreen> {
             return _whileLoading();
           }
           final ContentState? contentState = snapshot.data;
+          Widget? contentWidget;
           if (contentState is LoadedContentState) {
             if (contentState.content is List<Day>) {
-              print('is daily');
-              _showDaily(contentState.content as List<Day>);
+              contentWidget = _showDaily(contentState.content as List<Day>);
             } else if (contentState.content is List<Hour>) {
-              print('is hourly');
-              _showHourly(contentState.content as List<Hour>);
+              contentWidget = _showHourly(contentState.content as List<Hour>);
             }
           }
 
@@ -116,7 +112,6 @@ class HomeScreenState extends State<HomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                // _locationWidget!,
                 _getLocationWidget(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -143,7 +138,7 @@ class HomeScreenState extends State<HomeScreen> {
                 ),
                 contentState is LoadingContentState
                     ? _whileLoading()
-                    : _apiContentWidget ?? Text(easy_local.tr('data_is_coming')),
+                    : contentWidget ?? Text(easy_local.tr('data_is_coming')),
               ],
             ),
           );

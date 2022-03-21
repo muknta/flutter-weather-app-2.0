@@ -23,4 +23,10 @@ class LocalRepository implements ILocalRepository {
 
   @override
   Future<bool> setHourlyContent({required List<Hour> content}) => _localDataSource.setHourlyContent(content: content);
+
+  @override
+  Future<bool> deleteDailyContent() => _localDataSource.deleteDailyContent();
+
+  @override
+  Future<bool> deleteHourlyContent() => _localDataSource.deleteHourlyContent();
 }

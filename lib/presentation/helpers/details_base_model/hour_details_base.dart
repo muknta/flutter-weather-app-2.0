@@ -27,19 +27,19 @@ class HourDetailsBase implements IDetailsBase {
     switch (title) {
       case 'time':
         return toTimeOfDayStr(hour.time, dayTimeFormatOfLang);
-      case 'weather_main':
+      case 'weather_main_info':
         return hour.weatherMain;
-      case 'weather_desc':
+      case 'weather_description':
         return hour.weatherDesc;
       case 'temperature':
         return hour.temperature;
-      case 'temp_feels_like':
+      case 'temperature_feels_like':
         return hour.tempFeelsLike;
       case 'pressure':
         return hour.pressure;
       case 'humidity':
         return hour.humidity;
-      case 'atmospheric_temp':
+      case 'atmospheric_temperature':
         return hour.atmosphericTemp;
       case 'clouds':
         return hour.clouds;

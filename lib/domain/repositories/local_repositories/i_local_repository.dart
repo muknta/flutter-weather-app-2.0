@@ -11,4 +11,8 @@ abstract class ILocalRepository {
   Future<bool> setDailyContent({required List<Day> content});
 
   Future<bool> setHourlyContent({required List<Hour> content});
+
+  Future<bool> deleteDailyContent();
+
+  Future<bool> deleteHourlyContent();
 }
