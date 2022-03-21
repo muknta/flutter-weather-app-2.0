@@ -2,7 +2,7 @@ import 'package:weather_app_2_0/domain/repositories/local_repositories/i_local_r
 import 'package:weather_app_2_0/domain/use_cases/i_use_case.dart';
 import 'package:weather_app_2_0/domain/model/hour/hour.dart';
 
-class SetHourlyContent with IUseCase<int, List<Hour>> {
+class SetHourlyContent with IUseCase<bool, List<Hour>> {
   const SetHourlyContent({
     required ILocalRepository localRepository,
   }) : _localRepository = localRepository;
@@ -10,5 +10,5 @@ class SetHourlyContent with IUseCase<int, List<Hour>> {
   final ILocalRepository _localRepository;
 
   @override
-  Future<int> execute({required List<Hour> params}) => _localRepository.setHourlyContent(params);
+  Future<bool> execute({required List<Hour> params}) => _localRepository.setHourlyContent(content: params);
 }

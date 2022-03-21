@@ -53,11 +53,11 @@ class MainBloc with BlocStreamMixin {
 
   final _contentController = BehaviorSubject<ContentState>();
   Stream<ContentState> get contentStream => _contentController.stream;
-  SinkFunction<ContentState> get _updateContent => sinkAdd(_eventController);
+  SinkFunction<ContentState> get _updateContent => sinkAdd(_contentController);
 
   final _geoPositionController = BehaviorSubject<UpdatedGeoPositionState>();
   Stream<UpdatedGeoPositionState> get geoPositionStream => _geoPositionController.stream;
-  SinkFunction<UpdatedGeoPositionState> get _updateGeoPosition => sinkAdd(_eventController);
+  SinkFunction<UpdatedGeoPositionState> get _updateGeoPosition => sinkAdd(_geoPositionController);
 
   final _languageController = BehaviorSubject<Locale>();
   Stream<Locale> get languageStream => _languageController.stream;
@@ -92,12 +92,13 @@ class MainBloc with BlocStreamMixin {
 
   Future<void> _checkLanguage() async {
     String? userLanguage = await GetUserLanguage(localRepository: _localRepository).execute();
-    if (userLanguage == null) {
+    if (userLanguage == null || userLanguage.isEmpty) {
       userLanguage = currentLanguage;
       await SetUserLanguage(localRepository: _localRepository).execute(params: userLanguage);
     } else {
       currentLanguage = userLanguage;
     }
+    print('userLanguage $userLanguage');
     _setLanguage(Locale(userLanguage));
   }
 

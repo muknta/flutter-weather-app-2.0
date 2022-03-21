@@ -2,7 +2,7 @@ import 'package:weather_app_2_0/domain/repositories/local_repositories/i_local_r
 import 'package:weather_app_2_0/domain/use_cases/i_use_case.dart';
 import 'package:weather_app_2_0/domain/model/day/day.dart';
 
-class SetDailyContent with IUseCase<int, List<Day>> {
+class SetDailyContent with IUseCase<bool, List<Day>> {
   const SetDailyContent({
     required ILocalRepository localRepository,
   }) : _localRepository = localRepository;
@@ -10,5 +10,5 @@ class SetDailyContent with IUseCase<int, List<Day>> {
   final ILocalRepository _localRepository;
 
   @override
-  Future<int> execute({required List<Day> params}) => _localRepository.setDailyContent(params);
+  Future<bool> execute({required List<Day> params}) => _localRepository.setDailyContent(content: params);
 }

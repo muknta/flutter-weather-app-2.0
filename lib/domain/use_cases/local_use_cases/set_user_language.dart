@@ -8,6 +8,8 @@ class SetUserLanguage with IUseCase<int, String> {
 
   final ILocalRepository _localRepository;
 
+  // TODO:
   @override
-  Future<int> execute({required String params}) => _localRepository.setUserLanguage(params);
+  Future<int> execute({required String params}) async => 0;
+  // _localRepository.setUserLanguage(params);
 }

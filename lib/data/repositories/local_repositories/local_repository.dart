@@ -12,9 +12,15 @@ class LocalRepository implements ILocalRepository {
 
   final ILocalDataSource _localDataSource;
 
-  Future<List<Day>> getDailyContent();
-  Future<void> setDailyContent({required List<Day> content});
+  @override
+  Future<List<Day>> getDailyContent() => _localDataSource.getDailyContent();
 
-  Future<List<Hour>> getHourlyContent();
-  Future<void> setHourlyContent({required List<Hour> content});
+  @override
+  Future<List<Hour>> getHourlyContent() => _localDataSource.getHourlyContent();
+
+  @override
+  Future<bool> setDailyContent({required List<Day> content}) => _localDataSource.setDailyContent(content: content);
+
+  @override
+  Future<bool> setHourlyContent({required List<Hour> content}) => _localDataSource.setHourlyContent(content: content);
 }

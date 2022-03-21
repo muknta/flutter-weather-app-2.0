@@ -16,10 +16,6 @@ const String hourDetailsRoute = '/details/hour';
 const String hourDetailsRouteHourArg = 'hour';
 const String dayDetailsRoute = '/details/day';
 const String dayDetailsRouteDayArg = 'day';
-const String detailsRouteLanguageArg = 'language';
-const String detailsRouteDayTimeFormatOfLangArg = 'day_time_format_of_lang';
-const String detailsRouteDateFormatOfLangArg = 'date_format_of_lang';
-const String detailsRouteTranslatesMapArg = 'translates_map';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {
@@ -38,35 +34,19 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case hourDetailsRoute:
       final arguments = settings.arguments as Map<String, dynamic>;
       final Hour hour = arguments[hourDetailsRouteHourArg];
-      final String language = arguments[detailsRouteLanguageArg];
-      final String dayTimeFormatOfLang = arguments[detailsRouteDayTimeFormatOfLangArg];
-      final String dateFormatOfLang = arguments[detailsRouteDateFormatOfLangArg];
-      final Map<String, dynamic> translatesMap = arguments[detailsRouteTranslatesMapArg];
       return _getPageRoute(
         routeName: settings.name!,
         viewToShow: HourDetailsScreen(
           hour: hour,
-          language: language,
-          dayTimeFormatOfLang: dayTimeFormatOfLang,
-          dateFormatOfLang: dateFormatOfLang,
-          translatesMap: translatesMap,
         ),
       );
     case dayDetailsRoute:
       final arguments = settings.arguments as Map<String, dynamic>;
       final Day day = arguments[dayDetailsRouteDayArg];
-      final String language = arguments[detailsRouteLanguageArg];
-      final String dayTimeFormatOfLang = arguments[detailsRouteDayTimeFormatOfLangArg];
-      final String dateFormatOfLang = arguments[detailsRouteDateFormatOfLangArg];
-      final Map<String, dynamic> translatesMap = arguments[detailsRouteTranslatesMapArg];
       return _getPageRoute(
         routeName: settings.name!,
         viewToShow: DayDetailsScreen(
           day: day,
-          language: language,
-          dayTimeFormatOfLang: dayTimeFormatOfLang,
-          dateFormatOfLang: dateFormatOfLang,
-          translatesMap: translatesMap,
         ),
       );
     default:

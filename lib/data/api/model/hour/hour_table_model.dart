@@ -6,7 +6,7 @@ part 'hour_table_model.g.dart';
 @JsonSerializable()
 class HourTableModel {
   HourTableModel({
-    required DateTime time,
+    required this.time,
     required this.weatherMain,
     required this.weatherDesc,
     required this.weatherIconCode,
@@ -20,16 +20,14 @@ class HourTableModel {
     required this.windDegrees,
     this.snow,
     this.rain,
-  }) {
-    timeInMilliseconds = time.millisecondsSinceEpoch;
-  }
+  });
 
   factory HourTableModel.fromJson(Map<String, dynamic> json) => _$HourTableModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$HourTableModelToJson(this);
 
-  @JsonKey(name: 'timeInMilliseconds')
-  late final int timeInMilliseconds;
+  @JsonKey(name: 'time')
+  late final int time;
   @JsonKey(name: 'weatherMain')
   final String weatherMain;
   @JsonKey(name: 'weatherDesc')

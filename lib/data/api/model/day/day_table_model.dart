@@ -6,9 +6,9 @@ part 'day_table_model.g.dart';
 @JsonSerializable()
 class DayTableModel {
   DayTableModel({
-    required DateTime time,
-    required DateTime sunrise,
-    required DateTime sunset,
+    required this.time,
+    required this.sunrise,
+    required this.sunset,
     required this.weatherMain,
     required this.weatherDesc,
     required this.weatherIconCode,
@@ -30,22 +30,18 @@ class DayTableModel {
     required this.windDegrees,
     this.snow,
     this.rain,
-  }) {
-    timeInMilliseconds = time.millisecondsSinceEpoch;
-    sunriseInMilliseconds = sunrise.millisecondsSinceEpoch;
-    sunsetInMilliseconds = sunset.millisecondsSinceEpoch;
-  }
+  });
 
   factory DayTableModel.fromJson(Map<String, dynamic> json) => _$DayTableModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$DayTableModelToJson(this);
 
-  @JsonKey(name: 'timeInMilliseconds')
-  late final int timeInMilliseconds;
-  @JsonKey(name: 'sunriseInMilliseconds')
-  late final int sunriseInMilliseconds;
-  @JsonKey(name: 'sunsetInMilliseconds')
-  late final int sunsetInMilliseconds;
+  @JsonKey(name: 'time')
+  late final int time;
+  @JsonKey(name: 'sunrise')
+  late final int sunrise;
+  @JsonKey(name: 'sunset')
+  late final int sunset;
   @JsonKey(name: 'weatherMain')
   final String weatherMain;
   @JsonKey(name: 'weatherDesc')

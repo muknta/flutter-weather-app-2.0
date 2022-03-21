@@ -8,6 +8,8 @@ class GetUserLanguage with IUseCase<String?, NoParams> {
 
   final ILocalRepository _localRepository;
 
+  // TODO:
   @override
-  Future<String?> execute({NoParams params}) => _localRepository.getUserLanguage();
+  Future<String?> execute({NoParams params}) async => '';
+  // _localRepository.getUserLanguage();
 }

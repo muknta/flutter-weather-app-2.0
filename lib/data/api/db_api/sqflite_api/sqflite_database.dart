@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:weather_app_2_0/data/api/db_api/sqflite_api/schemas/hour_sqflite_schema.dart';
 import 'package:weather_app_2_0/data/api/db_api/sqflite_api/schemas/day_sqflite_schema.dart';
-import 'package:weather_app_2_0/internal/config.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';

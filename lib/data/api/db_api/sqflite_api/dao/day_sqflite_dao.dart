@@ -9,18 +9,18 @@ import 'package:sqflite/sqflite.dart';
 class DaySqfliteDao {
   Future<Database> get _db => SqfliteDatabase.instance.database;
 
-  Future<List<bool>> insertAll({required List<Map<String, dynamic>> posts}) async {
+  Future<List<bool>> insertAll({required List<Map<String, dynamic>> days}) async {
     final listOfReturnedValues = <bool>[];
-    for (final Map<String, dynamic> post in posts) {
-      listOfReturnedValues.add(await insert(post: post));
+    for (final Map<String, dynamic> day in days) {
+      listOfReturnedValues.add(await insert(day: day));
     }
     return listOfReturnedValues;
   }
 
-  Future<bool> insert({required Map<String, dynamic> post}) async =>
+  Future<bool> insert({required Map<String, dynamic> day}) async =>
       await (await _db).insert(
         DaySqfliteSchema.tableName,
-        post,
+        day,
       ) !=
       unsuccessfulReturnValueSqflite;
 
