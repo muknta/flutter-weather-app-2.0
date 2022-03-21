@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:injectable/injectable.dart';
 import 'package:weather_app_2_0/data/api/rest_api/interceptors/dio_error_interceptor.dart';
 import 'package:weather_app_2_0/data/api/rest_api/request/get_request_body.dart';
 import 'package:weather_app_2_0/data/data_sources/remote_data_sources/i_remote_data_source.dart';
@@ -9,6 +10,7 @@ import 'package:weather_app_2_0/domain/model/day/day.dart';
 import 'package:weather_app_2_0/domain/model/hour/hour.dart';
 import 'package:flutter/foundation.dart';
 
+@LazySingleton(as: IRemoteDataSource)
 class RemoteDataSource implements IRemoteDataSource {
   RemoteDataSource() {
     final dio = Dio(OpenWeatherMapService.baseOptions);

@@ -1,11 +1,14 @@
-class Day {
+import 'package:weather_app_2_0/domain/model/i_model.dart';
+import 'package:weather_app_2_0/presentation/mixins/day_details_base.dart';
+
+class Day extends IModel with DayDetailsBase {
   const Day({
-    required this.time,
+    required DateTime time,
     required this.sunrise,
     required this.sunset,
-    required this.weatherMain,
-    required this.weatherDesc,
-    required this.weatherIconCode,
+    required String weatherMain,
+    required String weatherDesc,
+    required String weatherIconCode,
     required this.dayTemp,
     required this.minTemp,
     required this.maxTemp,
@@ -16,22 +19,31 @@ class Day {
     required this.nightTempFeelsLike,
     required this.eveTempFeelsLike,
     required this.mornTempFeelsLike,
-    required this.pressure,
-    required this.humidity,
-    required this.atmosphericTemp,
-    required this.clouds,
-    required this.windSpeed,
-    required this.windDegrees,
-    this.snow,
-    this.rain,
-  });
+    required int pressure,
+    required int humidity,
+    required num atmosphericTemp,
+    required int clouds,
+    required num windSpeed,
+    required int windDegrees,
+    num? snow,
+    num? rain,
+  }) : super(
+          time: time,
+          weatherMain: weatherMain,
+          weatherDesc: weatherDesc,
+          weatherIconCode: weatherIconCode,
+          pressure: pressure,
+          humidity: humidity,
+          atmosphericTemp: atmosphericTemp,
+          clouds: clouds,
+          windSpeed: windSpeed,
+          windDegrees: windDegrees,
+          snow: snow,
+          rain: rain,
+        );
 
-  final DateTime time;
   final DateTime sunrise;
   final DateTime sunset;
-  final String weatherMain;
-  final String weatherDesc;
-  final String weatherIconCode;
   final num dayTemp;
   final num minTemp;
   final num maxTemp;
@@ -42,12 +54,4 @@ class Day {
   final num nightTempFeelsLike;
   final num eveTempFeelsLike;
   final num mornTempFeelsLike;
-  final int pressure;
-  final int humidity;
-  final num atmosphericTemp;
-  final int clouds;
-  final num windSpeed;
-  final int windDegrees;
-  final num? snow;
-  final num? rain;
 }

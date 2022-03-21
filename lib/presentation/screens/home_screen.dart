@@ -10,14 +10,12 @@ import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:weather_app_2_0/domain/model/day/day.dart';
 import 'package:weather_app_2_0/domain/model/hour/hour.dart';
-import 'package:weather_app_2_0/domain/bloc/home_bloc.dart';
 import 'package:weather_app_2_0/data/storage/constants.dart';
-
-import 'helpers/day_helper.dart';
-import 'helpers/hour_helper.dart';
-import 'helpers/list_helper.dart';
-import 'day_screen.dart';
-import 'hour_screen.dart';
+import 'package:weather_app_2_0/internal/services/locator.dart';
+import 'package:weather_app_2_0/internal/services/navigation/navigation.dart';
+import 'package:weather_app_2_0/presentation/bloc/main_bloc/main_bloc.dart';
+import 'package:weather_app_2_0/presentation/helpers/details_styles.dart';
+import 'package:weather_app_2_0/presentation/widgets/home/list_parameters_view.dart';
 
 bool isTablet() {
   final Size size = window.physicalSize;
@@ -53,7 +51,7 @@ class HomeScreenState extends State<HomeScreen> {
 
   List<Day>? _daily;
   List<Hour>? _hourly;
-  HomeBloc? homeBloc;
+  MainBloc? mainBloc;
   bool? dailyPressed;
   bool? hourlyPressed;
 
@@ -74,82 +72,77 @@ class HomeScreenState extends State<HomeScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    mainBloc = Provider.of<MainBloc>(context);
     _locationWidget = _getLocationWidget();
   }
 
   @override
-  Widget build(BuildContext context) => Consumer<HomeBloc>(
-        builder: (context, _homeBloc, child) {
-          homeBloc = _homeBloc;
+  Widget build(BuildContext context) => StreamBuilder<List<Day>>(
+        stream: mainBloc?.dailyStream,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            _daily = snapshot.data;
+            if (dailyPressed ?? false) {
+              _apiContentWidget = _showDaily(_daily!);
+              debugPrint('showing daily stream');
+              dailyPressed = false;
+            }
+            debugPrint('hass Daily');
+          } else {
+            debugPrint('hass NOT Daily Dataa');
+          }
 
-          return StreamBuilder<List<Day>>(
-            stream: homeBloc?.dailyStream,
+          return StreamBuilder<List<Hour>?>(
+            stream: mainBloc?.hourlyStream,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                _daily = snapshot.data;
-                if (dailyPressed ?? false) {
-                  _apiContentWidget = _showDaily(_daily!);
-                  debugPrint('showing daily stream');
-                  dailyPressed = false;
+                _hourly = snapshot.data;
+                if (hourlyPressed ?? false) {
+                  _apiContentWidget = _showHourly(_hourly!);
+                  debugPrint('showing hourly stream');
+                  hourlyPressed = false;
                 }
-                debugPrint('hass Daily');
+                debugPrint('hass Hourly');
               } else {
-                debugPrint('hass NOT Daily Dataa');
+                debugPrint('hass NOT Hourly Dataa');
               }
 
-              return StreamBuilder<List<Hour>?>(
-                stream: homeBloc?.hourlyStream,
+              return StreamBuilder<String>(
+                stream: mainBloc?.languageStream,
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
-                    _hourly = snapshot.data;
-                    if (hourlyPressed ?? false) {
-                      _apiContentWidget = _showHourly(_hourly!);
-                      debugPrint('showing hourly stream');
-                      hourlyPressed = false;
-                    }
-                    debugPrint('hass Hourly');
+                    _language = snapshot.data;
+                    _dateFormatOfLang = localePhrases['time']['date_format'][_language];
+                    _dayTimeFormatOfLang = localePhrases['time']['day_time_format'][_language];
+                    _hintDetailed = localePhrases['data']['press_detailed'][_language];
+                    debugPrint('hass Language $_language');
                   } else {
-                    debugPrint('hass NOT Hourly Dataa');
+                    debugPrint('hass NOT Language Dataa');
                   }
 
-                  return StreamBuilder<String>(
-                    stream: homeBloc?.languageStream,
+                  return StreamBuilder<List<double>>(
+                    stream: mainBloc?.positionStream,
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
-                        _language = snapshot.data;
-                        _dateFormatOfLang = localePhrases['time']['date_format'][_language];
-                        _dayTimeFormatOfLang = localePhrases['time']['day_time_format'][_language];
-                        _hintDetailed = localePhrases['data']['press_detailed'][_language];
-                        debugPrint('hass Language $_language');
+                        _latitude = snapshot.data![0];
+                        _longitude = snapshot.data![1];
+                        _locationWidget = _getLocationWidget();
+                        debugPrint('hass Position ${snapshot.data}');
                       } else {
-                        debugPrint('hass NOT Language Dataa');
+                        debugPrint('hass NOT Hourly Dataa');
                       }
 
-                      return StreamBuilder<List<double>>(
-                        stream: homeBloc?.positionStream,
+                      return StreamBuilder<bool>(
+                        stream: mainBloc?.isLoadingStream,
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
-                            _latitude = snapshot.data![0];
-                            _longitude = snapshot.data![1];
-                            _locationWidget = _getLocationWidget();
-                            debugPrint('hass Position ${snapshot.data}');
+                            _isLoading = snapshot.data;
+                            debugPrint('hass isLoading ${snapshot.data}');
                           } else {
-                            debugPrint('hass NOT Hourly Dataa');
+                            debugPrint('hass NOT isLoading Dataa');
                           }
 
-                          return StreamBuilder<bool>(
-                            stream: homeBloc?.isLoadingStream,
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData) {
-                                _isLoading = snapshot.data;
-                                debugPrint('hass isLoading ${snapshot.data}');
-                              } else {
-                                debugPrint('hass NOT isLoading Dataa');
-                              }
-
-                              return _futureBuilderLocation();
-                            },
-                          );
+                          return _futureBuilderLocation();
                         },
                       );
                     },
@@ -179,17 +172,17 @@ class HomeScreenState extends State<HomeScreen> {
           ],
         ),
         body: Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: _contentColumn(),
         ),
       );
 
   Widget _languageChooser() => DropdownButton<String>(
         value: _language,
-        icon: Icon(Icons.arrow_downward),
+        icon: const Icon(Icons.arrow_downward),
         iconSize: 24,
         elevation: 16,
-        style: TextStyle(color: Colors.brown),
+        style: const TextStyle(color: Colors.brown),
         underline: Container(
           height: 2,
           color: Colors.brown,
@@ -198,21 +191,21 @@ class HomeScreenState extends State<HomeScreen> {
           setState(() {
             _language = chosenLang;
           });
-          homeBloc?.setLanguage.add(_language!);
+          mainBloc?.setLanguage.add(_language!);
         },
-        items: _availableLangs.map<DropdownMenuItem<String>>((String value) {
-          return DropdownMenuItem<String>(
-            value: value,
-            child: Text(
-              value,
-              style: TextStyle(fontSize: 20),
-            ),
-          );
-        }).toList(),
+        items: _availableLangs
+            .map<DropdownMenuItem<String>>((String value) => DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(
+                    value,
+                    style: const TextStyle(fontSize: 20),
+                  ),
+                ))
+            .toList(),
       );
 
   Widget _contentColumn() => SingleChildScrollView(
-        physics: ScrollPhysics(),
+        physics: const ScrollPhysics(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
@@ -269,13 +262,15 @@ class HomeScreenState extends State<HomeScreen> {
     final List<Widget> _dayWidgetList = [_getHintDetailed()];
 
     for (final day in dayList) {
-      _dayWidgetList.add(ListHelper.getIconFromNetwork(day.weatherIconCode));
       final String timeFormat = DateFormat(_dateFormatOfLang).format(day.time);
-      _dayWidgetList.add(Text(
-        '${dayFieldsInfo["time"][_language]} $timeFormat',
-        style: ListHelper.titleStyle(),
-      ));
-      _dayWidgetList.add(_getDayPartWidget(day));
+      _dayWidgetList.addAll([
+        getIconFromNetwork(day.weatherIconCode),
+        Text(
+          '${dayFieldsInfo["time"][_language]} $timeFormat',
+          style: titleStyle,
+        ),
+        _getDayPartWidget(day),
+      ]);
     }
     return _dayWidgetList;
   }
@@ -284,95 +279,79 @@ class HomeScreenState extends State<HomeScreen> {
     final List<Widget> _hourWidgetList = [_getHintDetailed()];
 
     for (final hour in hourList) {
-      _hourWidgetList.add(ListHelper.getIconFromNetwork(hour.weatherIconCode));
-      final String timeFormat = DateFormat("$_dayTimeFormatOfLang, $_dateFormatOfLang").format(hour.time);
-      _hourWidgetList.add(Text(
-        '${hourFieldsInfo["time"][_language]} $timeFormat',
-        style: ListHelper.titleStyle(),
-      ));
-      _hourWidgetList.add(_getHourPartWidget(hour));
+      final String timeFormat = DateFormat('$_dayTimeFormatOfLang, $_dateFormatOfLang').format(hour.time);
+      _hourWidgetList.addAll([
+        getIconFromNetwork(hour.weatherIconCode),
+        Text(
+          '${hourFieldsInfo["time"][_language]} $timeFormat',
+          style: titleStyle,
+        ),
+        _getHourPartWidget(hour),
+      ]);
     }
     return _hourWidgetList;
   }
 
   Widget _getDayPartWidget(Day day) {
     final List<String> _dayPartList = ['weather_desc', 'day_temp'];
-
-    return Container(
-      padding: const EdgeInsets.all(10.0),
-      decoration: ListHelper.boxDecorList(),
-      child: ListView.builder(
-        physics: const NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        itemCount: _dayPartList.length,
-        itemBuilder: (context, index) {
-          final String _title = _dayPartList[index];
-          return ListTile(
-            title: Text(dayFieldsInfo[_title][_language]),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => DayScreen(
-                    day: day,
-                    language: _language!,
-                    dayTimeFormatOfLang: _dayTimeFormatOfLang!,
-                    dateFormatOfLang: _dateFormatOfLang!,
-                  ),
-                ),
-              );
-            },
-            trailing: DayHelper.getDayFieldValueBoxByTitle(day, _title, _dayTimeFormatOfLang!, _language!),
-          );
+    void onTap() {
+      locator<NavigationService>().navigateTo(
+        dayDetailsRoute,
+        arguments: <String, dynamic>{
+          dayDetailsRouteDayArg: day,
+          detailsRouteLanguageArg: _language,
+          detailsRouteDayTimeFormatOfLangArg: _dayTimeFormatOfLang,
+          detailsRouteDateFormatOfLangArg: _dateFormatOfLang,
+          detailsRouteTranslatesMapArg: dayFieldsInfo,
         },
-      ),
+      );
+    }
+
+    return ListParametersView(
+      model: day,
+      parametersList: _dayPartList,
+      dayTimeFormatOfLang: _dayTimeFormatOfLang!,
+      onTap: onTap,
+      translatesMap: dayFieldsInfo,
+      language: _language!,
     );
   }
 
   Widget _getHourPartWidget(Hour hour) {
     final List<String> _hourPartList = ['weather_desc', 'temperature'];
-
-    return Container(
-      padding: const EdgeInsets.all(10.0),
-      decoration: ListHelper.boxDecorList(),
-      child: ListView.builder(
-        physics: const NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        itemCount: _hourPartList.length,
-        itemBuilder: (context, index) {
-          final String _title = _hourPartList[index];
-          return ListTile(
-            title: Text(hourFieldsInfo[_title][_language]),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => HourScreen(
-                    hour: hour,
-                    language: _language!,
-                    dayTimeFormatOfLang: _dayTimeFormatOfLang!,
-                    dateFormatOfLang: _dateFormatOfLang!,
-                  ),
-                ),
-              );
-            },
-            trailing: HourHelper.getHourFieldValueBoxByTitle(hour, _title, _dayTimeFormatOfLang!, _language!),
-          );
+    void onTap() {
+      locator<NavigationService>().navigateTo(
+        hourDetailsRoute,
+        arguments: <String, dynamic>{
+          hourDetailsRouteHourArg: hour,
+          detailsRouteLanguageArg: _language,
+          detailsRouteDayTimeFormatOfLangArg: _dayTimeFormatOfLang,
+          detailsRouteDateFormatOfLangArg: _dateFormatOfLang,
+          detailsRouteTranslatesMapArg: hourFieldsInfo,
         },
-      ),
+      );
+    }
+
+    return ListParametersView(
+      model: hour,
+      parametersList: _hourPartList,
+      dayTimeFormatOfLang: _dayTimeFormatOfLang!,
+      onTap: onTap,
+      translatesMap: hourFieldsInfo,
+      language: _language!,
     );
   }
 
   Widget _getHintDetailed() => Text(
         _hintDetailed!,
-        style: TextStyle(
+        style: const TextStyle(
           fontWeight: FontWeight.bold,
           // fontSize: 15,
         ),
       );
 
   Widget _whileLoading() => Container(
-        child: Center(
+        child: const Center(
           child: CircularProgressIndicator(),
         ),
       );
@@ -423,11 +402,13 @@ class HomeScreenState extends State<HomeScreen> {
       style: Theme.of(context).textTheme.caption,
     ));
     if (_currentPosition != null) {
-      content = [content[0]];
-      content.add(Text(
-        '${localePhrases['location']['current_position'][_language]}: $_currentPosition',
-        style: Theme.of(context).textTheme.caption,
-      ));
+      content = [
+        content[0],
+        Text(
+          '${localePhrases['location']['current_position'][_language]}: $_currentPosition',
+          style: Theme.of(context).textTheme.caption,
+        ),
+      ];
       if (_currentAddress != null) {
         content.add(Text(
           '${localePhrases['location']['current_address'][_language]}: $_currentAddress',
@@ -439,7 +420,7 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   List<Day> _getDaily() {
-    homeBloc?.updateDaily.add({
+    mainBloc?.updateDaily.add({
       'latitude': _latitude!,
       'longitude': _longitude!,
     });
@@ -448,7 +429,7 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   List<Hour>? _getHourly() {
-    homeBloc?.updateHourly.add({
+    mainBloc?.updateHourly.add({
       'latitude': _latitude!,
       'longitude': _longitude!,
     });
@@ -458,7 +439,7 @@ class HomeScreenState extends State<HomeScreen> {
 
   Future<void> _getCurrentLocation() async {
     // debugPrint('_getCurrentLocation111 IN');
-    geolocator = await Geolocator();
+    geolocator = Geolocator();
     // ..forceAndroidLocationManager; TODO:
     Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.best).then((Position position) {
       setState(() {
@@ -467,7 +448,7 @@ class HomeScreenState extends State<HomeScreen> {
         _longitude = _currentPosition?.longitude ?? 0.0;
         // debugPrint('_getCurrentLocation222 position: $position setState OUT');
       });
-      homeBloc?.setPosition.add([_latitude!, _longitude!]);
+      mainBloc?.setPosition.add([_latitude!, _longitude!]);
       // debugPrint('_getCurrentLocation333 setState After');
       _getAddressFromLatLng();
       // debugPrint('_getCurrentLocation444 geolocator OUT');

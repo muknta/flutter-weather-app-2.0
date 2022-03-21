@@ -25,7 +25,7 @@ Map<String, dynamic> localePhrases = {
       'en': 'Press on a box to detailed info.',
       'ru': 'Нажмите на контейнер для детальной информации.'
     },
-    'do_not_exist_lable': {
+    'do_not_exist_table': {
       'en': 'not this time',
       'ru': 'не в это время'
     },

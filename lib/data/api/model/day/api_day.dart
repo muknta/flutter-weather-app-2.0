@@ -26,8 +26,7 @@ class ApiDay {
         windDegrees = map['daily'][index]['wind_deg'],
         snow = map['daily'][index].containsKey('snow') ? map['daily'][index]['snow'] : null,
         rain = map['daily'][index].containsKey('rain') ? map['daily'][index]['rain'] : null {
-    print("mappp ${map['daily'][index]['sunrise']}");
-    debugPrint('ApiDay.fromApi: map: $map');
+    // debugPrint('ApiDay.fromApi: map: $map');
   }
 
   final num time;

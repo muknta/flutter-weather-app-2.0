@@ -4,17 +4,21 @@ import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:weather_app_2_0/domain/repository/day/daily_repository.dart';
-import 'package:weather_app_2_0/domain/repository/hour/hourly_repository.dart';
+import 'package:weather_app_2_0/domain/repositories/local_repositories/i_local_repository.dart';
+import 'package:weather_app_2_0/domain/repositories/remote_repositories/i_remote_repository.dart';
 import 'package:weather_app_2_0/domain/model/day/day.dart';
 import 'package:weather_app_2_0/domain/model/hour/hour.dart';
 import 'package:weather_app_2_0/data/mapper/day/daily_mapper.dart';
 import 'package:weather_app_2_0/data/mapper/hour/hourly_mapper.dart';
-import 'package:weather_app_2_0/internal/internet_check.dart';
+import 'package:weather_app_2_0/internal/services/internet_check.dart';
 
-class HomeBloc {
-  HomeBloc(this._dailyRepository, this._hourlyRepository)
-      : _defaultLanguage = 'en',
+class MainBloc {
+  MainBloc({
+    required IRemoteRepository remoteRepository,
+    required ILocalRepository localRepository,
+  })  : _remoteRepository = remoteRepository,
+        _localRepository = localRepository,
+        _defaultLanguage = 'en',
         _defaultPosition = [50.0, 30.0] {
     prefs = SharedPreferences.getInstance();
     prefs.then((val) {
@@ -56,8 +60,8 @@ class HomeBloc {
     });
   }
 
-  final DailyRepository _dailyRepository;
-  final HourlyRepository _hourlyRepository;
+  final IRemoteRepository _remoteRepository;
+  final ILocalRepository _localRepository;
   late final String _defaultLanguage;
 
   /// [latitude, longitude]
@@ -122,7 +126,7 @@ class HomeBloc {
     _setIsLoading.add(true);
     if (await isExistConnection()) {
       debugPrint('connection exist');
-      final data = await _dailyRepository.getDaily(
+      final data = await _remoteRepository.getDaily(
         latitude: latitude,
         longitude: longitude,
         language: language,
@@ -163,9 +167,8 @@ class HomeBloc {
     _setIsLoading.add(true);
     if (await isExistConnection()) {
       debugPrint('connection exist');
-      final data = await _hourlyRepository.getHourly(latitude: latitude, longitude: longitude, language: language);
+      final data = await _remoteRepository.getHourly(latitude: latitude, longitude: longitude, language: language);
 
-      debugPrint('hourly data: $data');
       _hourly = data;
       _updateHourly.add(_hourly);
       prefs.then((val) {
@@ -176,7 +179,6 @@ class HomeBloc {
       prefs.then((val) {
         final _hourlyStr = val.getString('hourly');
         _hourly = HourlyMapper.decode(_hourlyStr ?? '');
-        _updateHourly.add(null);
         _updateHourly.add(_hourly);
       });
     }
@@ -205,7 +207,7 @@ class HomeBloc {
   }
 
   void dispose() {
-    debugPrint('HomeBloc dispose');
+    debugPrint('MainBloc dispose');
     _dailyController.close();
     _dailyActionController.close();
     _hourlyController.close();

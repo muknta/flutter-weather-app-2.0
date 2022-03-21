@@ -16,7 +16,7 @@ class ApiHour {
         windDegrees = map['hourly'][index]['wind_deg'],
         snow = map['hourly'][index].containsKey('snow') ? map['hourly'][index]['snow']['1h'] : null,
         rain = map['hourly'][index].containsKey('rain') ? map['hourly'][index]['rain']['1h'] : null {
-    debugPrint('ApiDay.fromApi: map: $map');
+    // debugPrint('ApiDay.fromApi: map: $map');
   }
 
   final num time;

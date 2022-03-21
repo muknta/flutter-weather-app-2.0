@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import 'package:weather_app_2_0/presentation/splash_screen.dart';
-import 'package:weather_app_2_0/presentation/home_screen.dart';
-import 'package:weather_app_2_0/domain/bloc/home_bloc.dart';
-
-import 'routes.dart';
+import 'package:weather_app_2_0/domain/repositories/local_repositories/i_local_repository.dart';
+import 'package:weather_app_2_0/domain/repositories/remote_repositories/i_remote_repository.dart';
+import 'package:weather_app_2_0/internal/services/locator.dart';
+import 'package:weather_app_2_0/internal/services/navigation/navigation.dart';
+import 'package:weather_app_2_0/presentation/bloc/main_bloc/main_bloc.dart';
+import 'package:weather_app_2_0/presentation/screens/home_screen.dart';
 
 class Application extends StatelessWidget {
   const Application({Key? key}) : super(key: key);
@@ -14,24 +14,25 @@ class Application extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MultiProvider(
-      providers: [
-        Provider<HomeBloc>(
-          create: (_) => HomeBloc(),
-          dispose: (_, HomeBloc homeBloc) => homeBloc.dispose(),
+        providers: [
+          Provider<MainBloc>(
+            create: (_) => MainBloc(
+              remoteRepository: locator<IRemoteRepository>(),
+              localRepository: locator<ILocalRepository>(),
+            ),
+            dispose: (_, MainBloc mainBloc) => mainBloc.dispose(),
+          ),
+        ],
+        child: MaterialApp(
+          title: _title,
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+            visualDensity: VisualDensity.adaptivePlatformDensity,
+          ),
+          navigatorKey: locator<NavigationService>().navigatorKey,
+          onGenerateRoute: generateRoute,
+          initialRoute: splashRoute,
+          home: const HomeScreen(_title),
         ),
-      ],
-      child: MaterialApp(
-        title: _title,
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-        ),
-        home: const HomeScreen(_title),
-        initialRoute: splashScreenRouteName,
-        routes: {
-          splashScreenRouteName: (context) => SplashScreen(),
-          homeScreenRouteName: (context) => HomeScreen(_title),
-        },
-      ),
-    );
+      );
 }
