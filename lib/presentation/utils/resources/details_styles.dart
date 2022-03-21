@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:weather_app_2_0/data/api/rest_api/services/openweathermap_service.dart';
+import 'package:weather_app_2_0/internal/services/internet_check.dart';
 
 const TextStyle fieldStyle = TextStyle(
   fontSize: 15,
@@ -21,6 +22,3 @@ final BoxDecoration boxDecorList = BoxDecoration(
 
 String toTimeOfDayStr(DateTime rawTime, String _dayTimeFormatOfLang) =>
     DateFormat(_dayTimeFormatOfLang).format(rawTime);
-
-// TODO: move to repos
-Widget getIconFromNetwork(String iconCode) => Image.network(OpenWeatherMapService.getIconUrl(iconCode));

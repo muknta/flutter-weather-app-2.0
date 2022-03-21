@@ -5,6 +5,7 @@ import 'package:weather_app_2_0/data/api/db_api/sqflite_api/schemas/day_sqflite_
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:weather_app_2_0/data/api/db_api/sqflite_api/schemas/settings_sqflite_schema.dart';
 
 class SqfliteDatabase {
   SqfliteDatabase._();
@@ -22,6 +23,7 @@ class SqfliteDatabase {
         onCreate: (db, version) async {
           await db.execute(_sqlCodeCreateTableDays);
           await db.execute(_sqlCodeCreateTableHours);
+          await db.execute(_sqlCodeCreateTableSettings);
         },
         version: 1,
       );
@@ -71,6 +73,19 @@ class SqfliteDatabase {
           ${HourSqfliteSchema.windDegrees} INTEGER,
           ${HourSqfliteSchema.snow} NUMERIC,
           ${HourSqfliteSchema.rain} NUMERIC
+        );
+        ''';
+
+  final String _sqlCodeCreateTableSettings = '''
+        CREATE TABLE ${SettingsSqfliteSchema.tableName}(
+          ${SettingsSqfliteSchema.language} VARCHAR(10),
+          ${SettingsSqfliteSchema.position} TEXT,
+          ${SettingsSqfliteSchema.address} TEXT,
+          PRIMARY KEY
+            ( 
+              ${SettingsSqfliteSchema.language},
+              ${SettingsSqfliteSchema.position} 
+            )
         );
         ''';
 

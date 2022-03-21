@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart' as easy_local;
 import 'package:flutter/material.dart';
 import 'package:weather_app_2_0/domain/model/i_model.dart';
 import 'package:weather_app_2_0/presentation/utils/resources/details_styles.dart';
+import 'package:weather_app_2_0/presentation/widgets/icon_from_network.dart';
 
 class DetailsScreen extends StatelessWidget {
   const DetailsScreen({
@@ -30,7 +31,7 @@ class DetailsScreen extends StatelessWidget {
           physics: const ScrollPhysics(),
           child: Column(
             children: <Widget>[
-              getIconFromNetwork(_model.weatherIconCode),
+              IconFromNetwork(iconCode: _model.weatherIconCode),
               Container(
                 padding: const EdgeInsets.all(10.0),
                 // decoration: boxDecorList,

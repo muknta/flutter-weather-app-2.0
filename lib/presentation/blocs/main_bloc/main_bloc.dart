@@ -5,14 +5,17 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:weather_app_2_0/data/api/rest_api/request/get_request_body.dart';
+import 'package:weather_app_2_0/domain/model/coords_model.dart';
 import 'package:weather_app_2_0/domain/repositories/local_repositories/i_local_repository.dart';
 import 'package:weather_app_2_0/domain/repositories/remote_repositories/i_remote_repository.dart';
+import 'package:weather_app_2_0/domain/use_cases/local_use_cases/get_coordinates.dart';
 import 'package:weather_app_2_0/domain/use_cases/local_use_cases/get_daily_content.dart';
 import 'package:weather_app_2_0/domain/use_cases/local_use_cases/get_hourly_content.dart';
-import 'package:weather_app_2_0/domain/use_cases/local_use_cases/get_user_language.dart';
+import 'package:weather_app_2_0/domain/use_cases/local_use_cases/get_language.dart';
+import 'package:weather_app_2_0/domain/use_cases/local_use_cases/set_coordinates.dart';
 import 'package:weather_app_2_0/domain/use_cases/local_use_cases/set_daily_content.dart';
 import 'package:weather_app_2_0/domain/use_cases/local_use_cases/set_hourly_content.dart';
-import 'package:weather_app_2_0/domain/use_cases/local_use_cases/set_user_language.dart';
+import 'package:weather_app_2_0/domain/use_cases/local_use_cases/set_language.dart';
 import 'package:weather_app_2_0/domain/use_cases/remote_use_cases/fetch_daily_content.dart';
 import 'package:weather_app_2_0/domain/use_cases/remote_use_cases/fetch_hourly_content.dart';
 import 'package:weather_app_2_0/internal/services/internet_check.dart';
@@ -84,22 +87,33 @@ class MainBloc with BlocStreamMixin {
         if (supportedLangCodes.contains(event.chosenLanguageCode)) {
           currentLanguage = event.chosenLanguageCode;
           _setLanguage(Locale(event.chosenLanguageCode));
-          await SetUserLanguage(localRepository: _localRepository).execute(params: event.chosenLanguageCode);
+          await SetLanguage(localRepository: _localRepository).execute(params: event.chosenLanguageCode);
+          print('2222 remembered lang - ${event.chosenLanguageCode}');
         }
       }
     }
   }
 
   Future<void> _checkLanguage() async {
-    String? userLanguage = await GetUserLanguage(localRepository: _localRepository).execute();
+    String? userLanguage = await GetLanguage(localRepository: _localRepository).execute();
+    print('remembered lang - $userLanguage');
     if (userLanguage == null || userLanguage.isEmpty) {
       userLanguage = currentLanguage;
-      await SetUserLanguage(localRepository: _localRepository).execute(params: userLanguage);
+      await SetLanguage(localRepository: _localRepository).execute(params: userLanguage);
     } else {
       currentLanguage = userLanguage;
     }
-    print('userLanguage $userLanguage');
     _setLanguage(Locale(userLanguage));
+  }
+
+  Future<void> _updateFromLocalCoordinates() async {
+    final CoordsModel? coordinates = await GetCoordinates(localRepository: _localRepository).execute();
+    if (coordinates != null) {
+      _updateGeoPosition(UpdatedGeoPositionState(
+        position: coordinates.position,
+        address: coordinates.address,
+      ));
+    }
   }
 
   Future<void> _getDaily({
@@ -121,6 +135,7 @@ class MainBloc with BlocStreamMixin {
         return;
       }
     } else {
+      await _updateFromLocalCoordinates();
       final data = await GetDailyContent(localRepository: _localRepository).execute();
       if (data.isNotEmpty) {
         _updateContent(LoadedContentState(content: data));
@@ -150,6 +165,7 @@ class MainBloc with BlocStreamMixin {
         return;
       }
     } else {
+      await _updateFromLocalCoordinates();
       final data = await GetHourlyContent(localRepository: _localRepository).execute();
       if (data.isNotEmpty) {
         _updateContent(LoadedContentState(content: data));
@@ -172,6 +188,11 @@ class MainBloc with BlocStreamMixin {
 
     final String? address = await _getAddressFromLatLng(lat: _position!.latitude, lng: _position!.longitude);
     _updateGeoPosition(UpdatedGeoPositionState(
+      position: _position!,
+      address: address,
+    ));
+    await SetCoordinates(localRepository: _localRepository).execute(
+        params: CoordsModel(
       position: _position!,
       address: address,
     ));

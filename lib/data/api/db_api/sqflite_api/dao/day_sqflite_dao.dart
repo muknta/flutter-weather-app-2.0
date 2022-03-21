@@ -2,7 +2,6 @@ import 'package:injectable/injectable.dart';
 import 'package:weather_app_2_0/data/api/db_api/sqflite_api/helpers/const.dart';
 import 'package:weather_app_2_0/data/api/db_api/sqflite_api/schemas/day_sqflite_schema.dart';
 import 'package:weather_app_2_0/data/api/db_api/sqflite_api/sqflite_database.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
 @LazySingleton()

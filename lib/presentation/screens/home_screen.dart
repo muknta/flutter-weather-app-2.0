@@ -5,16 +5,13 @@ import 'package:geolocator/geolocator.dart';
 import 'package:easy_localization/easy_localization.dart' as easy_local;
 import 'package:weather_app_2_0/domain/model/day/day.dart';
 import 'package:weather_app_2_0/domain/model/hour/hour.dart';
-import 'package:weather_app_2_0/data/storage/constants.dart';
-import 'package:weather_app_2_0/domain/model/i_model.dart';
 import 'package:weather_app_2_0/internal/services/locator.dart';
 import 'package:weather_app_2_0/internal/services/navigation/navigation.dart';
-import 'package:weather_app_2_0/main.dart';
 import 'package:weather_app_2_0/presentation/blocs/main_bloc/bloc.dart';
 import 'package:weather_app_2_0/presentation/utils/resources/details_styles.dart';
 import 'package:weather_app_2_0/presentation/utils/resources/localization/locales.dart';
-import 'package:weather_app_2_0/presentation/utils/resources/theme.dart';
 import 'package:weather_app_2_0/presentation/widgets/home/list_parameters_view.dart';
+import 'package:weather_app_2_0/presentation/widgets/icon_from_network.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen(this._title, {Key? key}) : super(key: key);
@@ -163,7 +160,7 @@ class HomeScreenState extends State<HomeScreen> {
     for (final day in dayList) {
       final String timeFormat = easy_local.DateFormat(easy_local.tr('date_format')).format(day.time);
       _dayWidgetList.addAll([
-        getIconFromNetwork(day.weatherIconCode),
+        IconFromNetwork(iconCode: day.weatherIconCode),
         Text(
           '${easy_local.tr('time_field')} $timeFormat',
           style: titleStyle,
@@ -182,7 +179,7 @@ class HomeScreenState extends State<HomeScreen> {
           easy_local.DateFormat('${easy_local.tr('day_time_format')}, ${easy_local.tr('date_format')}')
               .format(hour.time);
       _hourWidgetList.addAll([
-        getIconFromNetwork(hour.weatherIconCode),
+        IconFromNetwork(iconCode: hour.weatherIconCode),
         Text(
           '${easy_local.tr('time_field')} $timeFormat',
           style: titleStyle,
