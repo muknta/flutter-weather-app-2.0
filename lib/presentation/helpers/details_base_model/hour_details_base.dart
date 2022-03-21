@@ -1,28 +1,28 @@
+import 'package:easy_localization/easy_localization.dart' as easy_local;
 import 'package:flutter/material.dart';
 import 'package:weather_app_2_0/domain/model/hour/hour.dart';
-import 'package:weather_app_2_0/data/storage/constants.dart';
 import 'package:weather_app_2_0/domain/model/i_model.dart';
-import 'package:weather_app_2_0/presentation/helpers/details_styles.dart';
-import 'package:weather_app_2_0/presentation/mixins/i_details_base.dart';
+import 'package:weather_app_2_0/presentation/utils/resources/details_styles.dart';
+import 'package:weather_app_2_0/presentation/helpers/details_base_model/i_details_base.dart';
 
 class HourDetailsBase implements IDetailsBase {
+// TODO: break
   @override
-  Widget getFieldValueBoxByTitle(IModel model, String title, String dayTimeFormatOfLang, String language) {
-    final String doNotExistTable = localePhrases['data']['do_not_exist_table'][language];
-
-    final value = _getFieldValueByTitle(model, title, dayTimeFormatOfLang);
+  Widget getFieldValueBoxByTitle(IModel model, String title) {
+    final value = _getFieldValueByTitle(model, title);
     return value != null
         ? Text(
-            '$value ${hourFieldsInfo[title]["unit"][language]}',
+            ' $value ${easy_local.tr("${title}_unit")}',
             style: fieldStyle,
           )
         : Text(
-            doNotExistTable,
+            easy_local.tr('do_not_exist_label'),
             style: fieldStyle,
           );
   }
 
-  dynamic _getFieldValueByTitle(IModel model, String title, String dayTimeFormatOfLang) {
+  dynamic _getFieldValueByTitle(IModel model, String title) {
+    final String dayTimeFormatOfLang = easy_local.tr('day_time_format');
     final hour = model as Hour;
     switch (title) {
       case 'time':

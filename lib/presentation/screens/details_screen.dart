@@ -1,30 +1,22 @@
+import 'package:easy_localization/easy_localization.dart' as easy_local;
 import 'package:flutter/material.dart';
 import 'package:weather_app_2_0/domain/model/i_model.dart';
-import 'package:weather_app_2_0/presentation/helpers/details_styles.dart';
+import 'package:weather_app_2_0/presentation/utils/resources/details_styles.dart';
 
 class DetailsScreen extends StatelessWidget {
   const DetailsScreen({
     Key? key,
     required IModel model,
-    required String language,
-    required String dayTimeFormatOfLang,
     required String timeFormat,
     required List<String> parametersList,
-    required Map<String, dynamic> translatesMap,
   })  : _model = model,
-        _language = language,
-        _dayTimeFormatOfLang = dayTimeFormatOfLang,
         _timeFormat = timeFormat,
         _parametersList = parametersList,
-        _translatesMap = translatesMap,
         super(key: key);
 
   final IModel _model;
-  final String _language;
-  final String _dayTimeFormatOfLang;
   final String _timeFormat;
   final List<String> _parametersList;
-  final Map<String, dynamic> _translatesMap;
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -49,12 +41,10 @@ class DetailsScreen extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final String _title = _parametersList[index + 1];
                     return ListTile(
-                      title: Text(_translatesMap[_title][_language]),
+                      title: Text(easy_local.tr(_title)),
                       trailing: _model.getFieldValueBoxByTitle(
                         _model,
                         _title,
-                        _dayTimeFormatOfLang,
-                        _language,
                       ),
                     );
                   },

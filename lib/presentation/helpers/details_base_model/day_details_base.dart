@@ -1,28 +1,28 @@
+import 'package:easy_localization/easy_localization.dart' as easy_local;
 import 'package:flutter/material.dart';
 import 'package:weather_app_2_0/domain/model/day/day.dart';
-import 'package:weather_app_2_0/data/storage/constants.dart';
 import 'package:weather_app_2_0/domain/model/i_model.dart';
-import 'package:weather_app_2_0/presentation/helpers/details_styles.dart';
-import 'package:weather_app_2_0/presentation/mixins/i_details_base.dart';
+import 'package:weather_app_2_0/presentation/utils/resources/details_styles.dart';
+import 'package:weather_app_2_0/presentation/helpers/details_base_model/i_details_base.dart';
 
 class DayDetailsBase implements IDetailsBase {
+// TODO: break
   @override
-  Widget getFieldValueBoxByTitle(IModel model, String title, String dayTimeFormatOfLang, String language) {
-    final doNotExistTable = localePhrases['data']['do_not_exist_table'][language];
-
-    final _value = _getFieldValueByTitle(model, title, dayTimeFormatOfLang);
+  Widget getFieldValueBoxByTitle(IModel model, String title) {
+    final _value = _getFieldValueByTitle(model, title);
     return _value != null
         ? Text(
-            '$_value ${dayFieldsInfo[title]["unit"][language]}',
+            '$_value ${easy_local.tr("${title}_unit")}',
             style: fieldStyle,
           )
         : Text(
-            doNotExistTable,
+            easy_local.tr('do_not_exist_label'),
             style: fieldStyle,
           );
   }
 
-  dynamic _getFieldValueByTitle(IModel model, String title, String dayTimeFormatOfLang) {
+  dynamic _getFieldValueByTitle(IModel model, String title) {
+    final String dayTimeFormatOfLang = easy_local.tr('day_time_format');
     final day = model as Day;
     switch (title) {
       case 'time':
@@ -31,35 +31,35 @@ class DayDetailsBase implements IDetailsBase {
         return toTimeOfDayStr(day.sunrise, dayTimeFormatOfLang);
       case 'sunset':
         return toTimeOfDayStr(day.sunset, dayTimeFormatOfLang);
-      case 'weather_main':
+      case 'weather_main_info':
         return day.weatherMain;
-      case 'weather_desc':
+      case 'weather_description':
         return day.weatherDesc;
-      case 'day_temp':
+      case 'day_temperature':
         return day.dayTemp;
-      case 'min_temp':
+      case 'min_temperature':
         return day.minTemp;
-      case 'max_temp':
+      case 'max_temperature':
         return day.maxTemp;
-      case 'night_temp':
+      case 'night_temperature':
         return day.nightTemp;
-      case 'eve_temp':
+      case 'evening_temperature':
         return day.eveTemp;
-      case 'morn_temp':
+      case 'morning_temperature':
         return day.mornTemp;
-      case 'day_temp_feels_like':
+      case 'day_temperature_feels_like':
         return day.dayTempFeelsLike;
-      case 'night_temp_feels_like':
+      case 'night_temperature_feels_like':
         return day.nightTempFeelsLike;
-      case 'eve_temp_feels_like':
+      case 'evening_temperature_feels_like':
         return day.eveTempFeelsLike;
-      case 'morn_temp_feels_like':
+      case 'morning_temperature_feels_like':
         return day.mornTempFeelsLike;
       case 'pressure':
         return day.pressure;
       case 'humidity':
         return day.humidity;
-      case 'atmospheric_temp':
+      case 'atmospheric_temperature':
         return day.atmosphericTemp;
       case 'clouds':
         return day.clouds;

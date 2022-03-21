@@ -1,5 +1,5 @@
 import 'package:weather_app_2_0/domain/model/i_model.dart';
-import 'package:weather_app_2_0/presentation/mixins/hour_details_base.dart';
+import 'package:weather_app_2_0/presentation/helpers/details_base_model/hour_details_base.dart';
 
 class Hour extends IModel with HourDetailsBase {
   const Hour({

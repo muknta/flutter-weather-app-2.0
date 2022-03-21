@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:weather_app_2_0/internal/services/locator.dart';
 import 'package:weather_app_2_0/internal/services/navigation/navigation.dart';
-import 'package:weather_app_2_0/internal/resources/resources_config.dart';
+import 'package:weather_app_2_0/presentation/utils/resources/resources_config.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({Key? key}) : super(key: key);

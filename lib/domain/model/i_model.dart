@@ -1,4 +1,4 @@
-import 'package:weather_app_2_0/presentation/mixins/i_details_base.dart';
+import 'package:weather_app_2_0/presentation/helpers/details_base_model/i_details_base.dart';
 
 abstract class IModel extends IDetailsBase {
   const IModel({
