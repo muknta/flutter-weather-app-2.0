@@ -4,17 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:weather_app_2_0/data/api/rest_api/request/get_request_body.dart';
 import 'package:weather_app_2_0/domain/repositories/local_repositories/i_local_repository.dart';
 import 'package:weather_app_2_0/domain/repositories/remote_repositories/i_remote_repository.dart';
-import 'package:weather_app_2_0/domain/model/day/day.dart';
-import 'package:weather_app_2_0/domain/model/hour/hour.dart';
-import 'package:weather_app_2_0/data/mapper/day/daily_mapper.dart';
-import 'package:weather_app_2_0/data/mapper/hour/hourly_mapper.dart';
+import 'package:weather_app_2_0/domain/use_cases/local_use_cases/get_daily_content.dart';
+import 'package:weather_app_2_0/domain/use_cases/local_use_cases/get_hourly_content.dart';
 import 'package:weather_app_2_0/domain/use_cases/local_use_cases/get_user_language.dart';
+import 'package:weather_app_2_0/domain/use_cases/local_use_cases/set_daily_content.dart';
+import 'package:weather_app_2_0/domain/use_cases/local_use_cases/set_hourly_content.dart';
 import 'package:weather_app_2_0/domain/use_cases/local_use_cases/set_user_language.dart';
+import 'package:weather_app_2_0/domain/use_cases/remote_use_cases/fetch_daily_content.dart';
+import 'package:weather_app_2_0/domain/use_cases/remote_use_cases/fetch_hourly_content.dart';
 import 'package:weather_app_2_0/internal/services/internet_check.dart';
-import 'package:weather_app_2_0/internal/services/locator.dart';
 import 'package:weather_app_2_0/presentation/utils/mixins/bloc_stream_mixin.dart';
 import 'package:weather_app_2_0/presentation/utils/resources/global_constants.dart';
 import 'package:weather_app_2_0/presentation/utils/resources/localization/locales.dart';
@@ -34,57 +35,18 @@ class MainBloc with BlocStreamMixin {
     _eventController.listen(_handleEvent);
 
     _geolocatorPlatform = GeolocatorPlatform.instance;
-
-    prefs = SharedPreferences.getInstance();
-    prefs.then((val) {
-      if (val.get('language') != null) {
-        _language = val.getString('language') ?? _defaultLanguage;
-      } else {
-        _language = _defaultLanguage;
-      }
-      _languageActionController.stream.listen(_changeLanguage);
-      _setLanguage.add(_language!);
-
-      if (val.get('latitude') != null && val.get('longitude') != null) {
-        _latitude = val.getDouble('latitude') ?? _defaultPosition[0];
-        _longitude = val.getDouble('longitude') ?? _defaultPosition[1];
-      } else {
-        _latitude = _defaultPosition[0];
-        _longitude = _defaultPosition[1];
-      }
-      _positionActionController.stream.listen(_changePosition);
-      _setPosition.add([_latitude!, _longitude!]);
-
-      if (val.get('hourly') != null) {
-        final _hourlyStr = val.getString('hourly');
-        if (_hourlyStr != null) {
-          _hourly = HourlyMapper.decode(_hourlyStr);
-          _updateHourly.add(_hourly!);
-        }
-      }
-      _hourlyActionController.stream.listen(_getHourlyByCoords);
-
-      if (val.get('daily') != null) {
-        final _dailyStr = val.getString('daily');
-        if (_dailyStr != null) {
-          _daily = DailyMapper.decode(_dailyStr);
-          _updateDaily.add(_daily!);
-        }
-      }
-      _dailyActionController.stream.listen(_getDailyByCoords);
-    });
   }
 
   final IRemoteRepository _remoteRepository;
   final ILocalRepository _localRepository;
 
   final String _defaultLanguage;
+  String? _language;
+
   final double _defaultLatitude;
   final double _defaultLongitude;
-
   late final GeolocatorPlatform _geolocatorPlatform;
-  String? _language;
-  late final Future<SharedPreferences> prefs;
+  Position? _position;
 
   final _eventController = BehaviorSubject<MainEvent>();
   Function(MainEvent) get addEvent => sinkAdd(_eventController);
@@ -122,17 +84,17 @@ class MainBloc with BlocStreamMixin {
         if (supportedLangCodes.contains(event.chosenLanguageCode)) {
           currentLanguage = event.chosenLanguageCode;
           _setLanguage(Locale(event.chosenLanguageCode));
-          await SetUserLanguage(localRepository: locator<ILocalRepository>()).execute(params: event.chosenLanguageCode);
+          await SetUserLanguage(localRepository: _localRepository).execute(params: event.chosenLanguageCode);
         }
       }
     }
   }
 
   Future<void> _checkLanguage() async {
-    String? userLanguage = await GetUserLanguage(localRepository: locator<ILocalRepository>()).execute();
+    String? userLanguage = await GetUserLanguage(localRepository: _localRepository).execute();
     if (userLanguage == null) {
       userLanguage = currentLanguage;
-      await SetUserLanguage(localRepository: locator<ILocalRepository>()).execute(params: userLanguage);
+      await SetUserLanguage(localRepository: _localRepository).execute(params: userLanguage);
     } else {
       currentLanguage = userLanguage;
     }
@@ -146,26 +108,23 @@ class MainBloc with BlocStreamMixin {
   }) async {
     _updateContent(const LoadingContentState());
     if (await isExistConnection()) {
-      final data = await _remoteRepository.getDaily(
+      final data = await FetchDailyContent(remoteRepository: _remoteRepository).execute(
+          params: GetRequestBody(
         latitude: latitude,
         longitude: longitude,
         language: language,
-      );
-
+      ));
       if (data.isNotEmpty) {
         _updateContent(LoadedContentState(content: data));
-        prefs.then((val) {
-          val.setString('daily', DailyMapper.encode(data));
-        });
+        await SetDailyContent(localRepository: _localRepository).execute(params: data);
         return;
       }
     } else {
-      prefs.then((val) {
-        final _dailyStr = val.getString('daily');
-        _daily = DailyMapper.decode(_dailyStr ?? '');
+      final data = await GetDailyContent(localRepository: _localRepository).execute();
+      if (data.isNotEmpty) {
         _updateContent(LoadedContentState(content: data));
-      });
-      return;
+        return;
+      }
     }
     _updateContent(const NotLoadedContentState());
   }
@@ -177,33 +136,26 @@ class MainBloc with BlocStreamMixin {
   }) async {
     _updateContent(const LoadingContentState());
     if (await isExistConnection()) {
-      final data = await _remoteRepository.getHourly(latitude: latitude, longitude: longitude, language: language);
+      final data = await FetchHourlyContent(remoteRepository: _remoteRepository).execute(
+          params: GetRequestBody(
+        latitude: latitude,
+        longitude: longitude,
+        language: language,
+      ));
 
       if (data.isNotEmpty) {
         _updateContent(LoadedContentState(content: data));
-        prefs.then((val) {
-          val.setString('hourly', HourlyMapper.encode(data));
-        });
+        await SetHourlyContent(localRepository: _localRepository).execute(params: data);
         return;
       }
     } else {
-      prefs.then((val) {
-        final _hourlyStr = val.getString('hourly');
-        _hourly = HourlyMapper.decode(_hourlyStr ?? '');
+      final data = await GetHourlyContent(localRepository: _localRepository).execute();
+      if (data.isNotEmpty) {
         _updateContent(LoadedContentState(content: data));
-      });
-      return;
+        return;
+      }
     }
     _updateContent(const NotLoadedContentState());
-  }
-
-  void _changeLanguage(String chosenLang) async {
-    _language = chosenLang ?? _defaultLanguage;
-
-    _setLanguage.add(_language!);
-    prefs.then((val) {
-      val.setString('language', _language ?? _defaultLanguage);
-    });
   }
 
   Future<void> _checkCurrentLocation() async {
@@ -215,11 +167,11 @@ class MainBloc with BlocStreamMixin {
   }
 
   Future<void> _updateCurrentLocation() async {
-    final Position _position = await _geolocatorPlatform.getCurrentPosition();
+    _position = await _geolocatorPlatform.getCurrentPosition();
 
-    final String? address = await _getAddressFromLatLng(lat: _position.latitude, lng: _position.longitude);
+    final String? address = await _getAddressFromLatLng(lat: _position!.latitude, lng: _position!.longitude);
     _updateGeoPosition(UpdatedGeoPositionState(
-      position: _position,
+      position: _position!,
       address: address,
     ));
   }

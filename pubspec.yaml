@@ -35,8 +35,7 @@ dependencies:
   injectable: ^1.5.3
   provider: ^6.0.2
   # DB
-  shared_preferences: ^2.0.13
-#  sqflite: ^2.0.2
+  sqflite: ^2.0.2
   # REST API
   dio: ^4.0.4
   retrofit: ^3.0.1+1
@@ -53,6 +52,7 @@ dependencies:
   connectivity_plus: ^2.2.1
   geolocator: ^8.2.0
   geocoding: ^2.0.4
+  path_provider: ^2.0.9
   intl: ^0.17.0
   rxdart: ^0.27.3
 

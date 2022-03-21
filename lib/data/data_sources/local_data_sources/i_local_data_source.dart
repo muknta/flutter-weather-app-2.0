@@ -1,7 +1,7 @@
 import 'package:weather_app_2_0/domain/model/day/day.dart';
 import 'package:weather_app_2_0/domain/model/hour/hour.dart';
 
-abstract class ILocalRepository {
+abstract class ILocalDataSource {
   Future<List<Day>> getDailyContent();
   Future<void> setDailyContent({required List<Day> content});
 

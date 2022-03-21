@@ -18,7 +18,7 @@ class OpenWeatherMapService {
 
   static String getIconUrl(String iconCode) => '$_mainBaseUrl/img/wn/$iconCode@2x.png';
 
-  Future<List<ApiDay>> getDaily(GetRequestBody body) async {
+  Future<List<ApiDay>> fetchDailyContent(GetRequestBody body) async {
     debugPrint('service: BEFORE daily _dio.get; body: $body; body.toDailyApi: ${body.toDailyApi()}');
     final response = await _dio.get(
       '/data/2.5/onecall',
@@ -30,7 +30,7 @@ class OpenWeatherMapService {
     return ApiDaily.fromApi(response.data);
   }
 
-  Future<List<ApiHour>> getHourly(GetRequestBody body) async {
+  Future<List<ApiHour>> fetchHourlyContent(GetRequestBody body) async {
     debugPrint('service: BEFORE hourly _dio.get; body: $body');
     final response = await _dio.get(
       '/data/2.5/onecall',

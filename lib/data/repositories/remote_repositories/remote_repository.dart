@@ -11,18 +11,18 @@ class RemoteRepository implements IRemoteRepository {
   final IRemoteDataSource _remoteDataSource;
 
   @override
-  Future<List<Day>> getDaily({
+  Future<List<Day>> fetchDailyContent({
     required double latitude,
     required double longitude,
     required String language,
   }) async =>
-      _remoteDataSource.getDaily(latitude: latitude, longitude: longitude, language: language);
+      _remoteDataSource.fetchDailyContent(latitude: latitude, longitude: longitude, language: language);
 
   @override
-  Future<List<Hour>> getHourly({
+  Future<List<Hour>> fetchHourlyContent({
     required double latitude,
     required double longitude,
     required String language,
   }) async =>
-      _remoteDataSource.getHourly(latitude: latitude, longitude: longitude, language: language);
+      _remoteDataSource.fetchHourlyContent(latitude: latitude, longitude: longitude, language: language);
 }

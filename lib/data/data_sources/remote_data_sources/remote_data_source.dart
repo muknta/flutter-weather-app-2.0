@@ -22,7 +22,7 @@ class RemoteDataSource implements IRemoteDataSource {
   late final OpenWeatherMapService _weatherService;
 
   @override
-  Future<List<Day>> getDaily({
+  Future<List<Day>> fetchDailyContent({
     required double latitude,
     required double longitude,
     required String language,
@@ -30,19 +30,19 @@ class RemoteDataSource implements IRemoteDataSource {
     debugPrint('ApiUtil IN getDay: latitude: $latitude, longitude: $longitude, language: $language');
     final body = GetRequestBody(latitude: latitude, longitude: longitude, language: language);
     debugPrint('ApiUtil IN getDay: body: $body; body.toDailyApi(): ${body.toDailyApi()}');
-    final dayList = await _weatherService.getDaily(body);
+    final dayList = await _weatherService.fetchDailyContent(body);
     debugPrint('ApiUtil OUT getDay: dayList: $dayList, dayList[0].pressure ${dayList[0].pressure}');
     return DailyMapper.fromApi(dayList);
   }
 
   @override
-  Future<List<Hour>> getHourly({
+  Future<List<Hour>> fetchHourlyContent({
     required double latitude,
     required double longitude,
     required String language,
   }) async {
     final body = GetRequestBody(latitude: latitude, longitude: longitude, language: language);
-    final result = await _weatherService.getHourly(body);
+    final result = await _weatherService.fetchHourlyContent(body);
     return HourlyMapper.fromApi(result);
   }
 }
