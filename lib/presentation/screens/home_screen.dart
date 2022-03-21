@@ -27,26 +27,12 @@ class HomeScreen extends StatefulWidget {
 
 class HomeScreenState extends State<HomeScreen> {
   String? _language;
-  Position? _currentPosition;
-  String? _currentAddress;
-  // Widget? _locationWidget;
-  double? _latitude;
-  double? _longitude;
   Widget? _apiContentWidget;
-
-  List<Day>? _daily;
-  List<Hour>? _hourly;
   late MainBloc mainBloc;
 
   @override
   void initState() {
     super.initState();
-    if (!isTablet()) {
-      SystemChrome.setPreferredOrientations([
-        DeviceOrientation.portraitUp,
-        DeviceOrientation.portraitDown,
-      ]);
-    }
     _language = 'en';
   }
 
@@ -111,14 +97,16 @@ class HomeScreenState extends State<HomeScreen> {
   Widget _contentColumn() => StreamBuilder<ContentState>(
         stream: mainBloc.contentStream,
         builder: (context, snapshot) {
-          if (!snapshot.hasData) {
+          if (snapshot.hasData && snapshot.data is LoadingContentState) {
             return _whileLoading();
           }
-          final ContentState contentState = snapshot.data!;
+          final ContentState? contentState = snapshot.data;
           if (contentState is LoadedContentState) {
             if (contentState.content is List<Day>) {
+              print('is daily');
               _showDaily(contentState.content as List<Day>);
             } else if (contentState.content is List<Hour>) {
+              print('is hourly');
               _showHourly(contentState.content as List<Hour>);
             }
           }

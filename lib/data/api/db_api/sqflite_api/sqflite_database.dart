@@ -51,7 +51,7 @@ class SqfliteDatabase {
           ${DaySqfliteSchema.windSpeed} NUMERIC,
           ${DaySqfliteSchema.windDegrees} INTEGER,
           ${DaySqfliteSchema.snow} NUMERIC,
-          ${DaySqfliteSchema.rain} NUMERIC,
+          ${DaySqfliteSchema.rain} NUMERIC
         );
         ''';
 
@@ -70,7 +70,7 @@ class SqfliteDatabase {
           ${HourSqfliteSchema.windSpeed} NUMERIC,
           ${HourSqfliteSchema.windDegrees} INTEGER,
           ${HourSqfliteSchema.snow} NUMERIC,
-          ${HourSqfliteSchema.rain} NUMERIC,
+          ${HourSqfliteSchema.rain} NUMERIC
         );
         ''';
 
