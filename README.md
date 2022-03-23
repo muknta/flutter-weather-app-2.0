@@ -30,11 +30,12 @@ results in my project - [daily.json](https://github.com/heknt/flutter-weather-ap
 $ git clone https://github.com/heknt/flutter-weather-app-2.0.git
 $ cd flutter-weather-app-2.0
 ```
-Set your own [openweathermap AppId](https://openweathermap.org/appid) in project [service config](https://github.com/heknt/flutter-weather-app-2.0/blob/master/lib/data/api/services/settings/config.dart)
+Set your own [openweathermap AppId](https://openweathermap.org/appid) in project [service config](https://github.com/heknt/flutter-weather-app-2.0/blob/master/lib/data/api/rest_api/services/settings/config.dart)
 
 Connect your phone to computer and enable USB debugging. Next:
 ```bash
-flutter-weather-app$ flutter doctor
-flutter-weather-app$ flutter pub get
-flutter-weather-app$ flutter run
+flutter-weather-app-2.0$ flutter doctor
+flutter-weather-app-2.0$ flutter pub get
+flutter-weather-app-2.0$ flutter pub run build_runner build --delete-conflicting-outputs
+flutter-weather-app-2.0$ flutter run
 ```
